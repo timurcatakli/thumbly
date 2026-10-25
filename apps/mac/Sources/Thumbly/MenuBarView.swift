@@ -10,8 +10,8 @@ struct MenuBarView: View {
                 VStack(alignment: .leading, spacing: 2) {
                     Text("Thumbly").font(Theme.display(15))
                     HStack(spacing: 6) {
-                        StatusDot(color: model.health.color, size: 7, blink: model.health == .busy)
-                        Text(model.headline).font(Theme.text(12)).foregroundStyle(Theme.inkSoft)
+                        StatusMark(health: model.health, paused: model.isPaused, size: 12)
+                        Text(model.headline).font(Theme.text(12, .semibold)).foregroundStyle(model.health.textColor)
                     }
                 }
             }

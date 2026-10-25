@@ -75,9 +75,10 @@ private struct ConnectionCard: View {
         let c = model.status?.connection
         Card(padding: 24) {
             HStack(alignment: .top, spacing: 24) {
-                PhoneBadge(color: model.health.color, busy: model.health == .busy)
+                PhoneBadge(health: model.health, paused: model.isPaused)
                 VStack(alignment: .leading, spacing: 8) {
                     Text(model.headline).font(Theme.display(26)).displayTracking(26)
+                        .foregroundStyle(model.health.textColor)
                         .fixedSize(horizontal: false, vertical: true)
                     if let message = c?.message, message.lowercased() != "connected" {
                         Text(message).font(Theme.text(14)).foregroundStyle(Theme.inkSoft)
@@ -99,18 +100,17 @@ private struct ConnectionCard: View {
     }
 }
 
-/// The phone glyph in a square 2px ink frame, with the status square on its corner. The square
-/// blinks while connecting.
+/// The phone glyph in a square 2px ink frame, with the status mark on its corner.
 struct PhoneBadge: View {
-    var color: Color
-    var busy = false
+    var health: Health
+    var paused = false
 
     var body: some View {
         ZStack(alignment: .bottomTrailing) {
             Rectangle().strokeBorder(Theme.ink, lineWidth: Theme.rule)
                 .frame(width: 88, height: 88)
                 .overlay(Image(systemName: "iphone.gen3").font(.system(size: 38, weight: .light)).foregroundStyle(Theme.ink))
-            StatusDot(color: color, size: 16, blink: busy)
+            StatusMark(health: health, paused: paused, size: 24)
                 .padding(3).background(Theme.canvas)
                 .offset(x: 8, y: 8)
         }

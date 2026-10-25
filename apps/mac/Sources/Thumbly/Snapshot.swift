@@ -1,6 +1,8 @@
 import AppKit
+import SwiftUI
 
-/// Dev aid: `THUMBLY_SNAPSHOT=<dir>` renders every section in light and dark mode to PNGs and quits.
+/// Dev aid: `THUMBLY_SNAPSHOT=<dir>` renders every section and the menu bar panel in light and dark
+/// mode to PNGs and quits.
 /// Works without Screen Recording permission because it draws the window's own view hierarchy.
 enum Snapshot {
     static let active = ProcessInfo.processInfo.environment["THUMBLY_SNAPSHOT"] != nil
@@ -25,9 +27,24 @@ enum Snapshot {
                     try? rep.representation(using: .png, properties: [:])?
                         .write(to: out.appendingPathComponent("\(extra)\(section.rawValue)-\(name).png"))
                 }
+                try? menuBar(model: model, appearance: appearance)?
+                    .write(to: out.appendingPathComponent("\(extra)menubar-\(name).png"))
             }
             NSApp.terminate(nil)
         }
+    }
+
+    /// The menu bar panel can't be opened from code, so draw MenuBarView in an offscreen window.
+    @MainActor private static func menuBar(model: AppModel, appearance: NSAppearance.Name) -> Data? {
+        let host = NSHostingView(rootView: MenuBarView().environment(model))
+        host.frame.size = host.fittingSize
+        let window = NSWindow(contentRect: host.frame, styleMask: .borderless, backing: .buffered, defer: false)
+        window.appearance = NSAppearance(named: appearance)
+        window.contentView = host
+        host.layoutSubtreeIfNeeded()
+        guard let rep = host.bitmapImageRepForCachingDisplay(in: host.bounds) else { return nil }
+        host.cacheDisplay(in: host.bounds, to: rep)
+        return rep.representation(using: .png, properties: [:])
     }
 }
 

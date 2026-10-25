@@ -74,9 +74,9 @@ private struct Sidebar: View {
             }
             Spacer()
             Rule(color: Theme.divider)
-            HStack(alignment: .firstTextBaseline, spacing: 8) {
-                StatusDot(color: model.health.color, size: 8, blink: model.health == .busy)
-                Text(model.headline).font(Theme.text(12, .medium)).foregroundStyle(Theme.ink)
+            HStack(spacing: 8) {
+                StatusMark(health: model.health, paused: model.isPaused)
+                Text(model.headline).font(Theme.text(12, .semibold)).foregroundStyle(model.health.textColor)
                     .lineLimit(2)
             }
             .padding(.horizontal, 20).padding(.vertical, 14)

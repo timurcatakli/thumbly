@@ -16,12 +16,35 @@ struct BrandMark: View {
 }
 
 extension Health {
-    /// Mono status: ink when all is well, the accent whenever the owner should look.
-    var color: Color {
+    /// Green when the iPhone is connected, red for every other state.
+    var color: Color { self == .good ? Theme.success : Theme.accent }
+    var textColor: Color { self == .good ? Theme.successText : Theme.accentText }
+
+    var icon: String {
         switch self {
-        case .good: Theme.ink
-        case .busy, .attention, .offline: Theme.accent
+        case .good: "checkmark"
+        case .busy: "ellipsis"
+        case .attention: "exclamationmark"
+        case .offline: "xmark"
         }
+    }
+}
+
+/// The connection state as a filled square with an icon: green check when connected, red otherwise.
+/// Blinks while connecting.
+struct StatusMark: View {
+    var health: Health
+    var paused = false
+    var size: CGFloat = 14
+
+    var body: some View {
+        StatusDot(color: health.color, size: size, blink: health == .busy)
+            .overlay {
+                Image(systemName: paused ? "pause.fill" : health.icon)
+                    .font(.system(size: size * 0.6, weight: .heavy))
+                    .foregroundStyle(health == .good ? Theme.onSuccess : Theme.onAccent)
+            }
+            .accessibilityHidden(true)
     }
 }
 

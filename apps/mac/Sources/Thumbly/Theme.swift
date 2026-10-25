@@ -25,6 +25,11 @@ enum Theme {
     static let accentText = dynamic(light: 0xAE1800, dark: 0xFF9783)
     static let onAccent = dynamic(light: 0xF3F2F2, dark: 0x181616)
 
+    // Connected: the one place a second hue appears, so "your iPhone is connected" reads at a glance.
+    static let success = dynamic(light: 0x1F9150, dark: 0x3DCB7A)      // status mark fill
+    static let successText = dynamic(light: 0x166F3B, dark: 0x4FD68A)  // status headline
+    static let onSuccess = dynamic(light: 0xF3F2F2, dark: 0x181616)
+
     // Structure: strong rules organise the page, hairlines separate rows.
     static let rule: CGFloat = 2
     static let hairline: CGFloat = 1
