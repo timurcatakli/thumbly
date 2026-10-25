@@ -158,6 +158,7 @@ def head(version: str) -> str:
 <meta name="robots" content="index, follow, max-image-preview:large">
 <link rel="canonical" href="{URL}">
 <meta name="author" content="Timur Catakli">
+<meta name="google-site-verification" content="8S3_WuYqsjjlJGmjs8J19q4N4MySBwqH0-Bgri5sziY">
 <meta name="theme-color" content="#ec3013">
 <meta name="color-scheme" content="light dark">
 <link rel="icon" href="favicon.ico" sizes="32x32">
