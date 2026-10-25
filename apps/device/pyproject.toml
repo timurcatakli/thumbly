@@ -14,7 +14,7 @@ dependencies = [
     "mcp>=2,<3",
     # Exact pin: the tunnel, HID and screenshot services rely on reverse-engineered wire formats
     # that can change between releases.
-    "pymobiledevice3==11.34.0",
+    "pymobiledevice3==11.43.1",
 ]
 
 [project.scripts]
