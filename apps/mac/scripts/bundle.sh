@@ -19,7 +19,7 @@ if [ ! -f build/AppIcon.icns ] || [ scripts/make_icon.swift -nt build/AppIcon.ic
 fi
 cp build/AppIcon.icns "$APP/Contents/Resources/AppIcon.icns"
 
-VERSION="${THUMBLY_APP_VERSION:-0.1.0}"
+VERSION="${THUMBLY_APP_VERSION:-$(cat ../../VERSION)}"
 cat > "$APP/Contents/Info.plist" <<PLIST
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">

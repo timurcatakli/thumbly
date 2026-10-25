@@ -1,6 +1,6 @@
 [project]
 name = "thumbly"
-version = "0.0.2"
+version = "0.1.0"
 description = "Let AI agents see and control your iPhone from your Mac"
 requires-python = ">=3.11,<3.15"
 license = "GPL-3.0-only"

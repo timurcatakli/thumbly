@@ -51,6 +51,8 @@ struct RootView: View {
 
 private struct Sidebar: View {
     @Environment(AppModel.self) private var model
+    // From Info.plist, which bundle.sh fills from the repo's VERSION file.
+    static let version = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "dev"
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
@@ -79,8 +81,12 @@ private struct Sidebar: View {
                 Text(model.headline).font(Theme.text(12, .semibold)).foregroundStyle(model.health.textColor)
                     .lineLimit(2)
             }
-            .padding(.horizontal, 20).padding(.vertical, 14)
+            .padding(.horizontal, 20).padding(.top, 14).padding(.bottom, 8)
             .frame(maxWidth: .infinity, alignment: .leading)
+            Link("v\(Self.version)", destination: URL(string: "https://github.com/timurcatakli/thumbly/releases/tag/v\(Self.version)")!)
+                .font(Theme.text(11)).foregroundStyle(Theme.inkSoft)
+                .padding(.horizontal, 20).padding(.bottom, 14)
+                .help("Thumbly \(Self.version): release notes")
         }
         .frame(width: 214)
         .frame(maxHeight: .infinity)
