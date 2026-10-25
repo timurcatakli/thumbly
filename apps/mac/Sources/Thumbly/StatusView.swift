@@ -5,41 +5,44 @@ struct StatusView: View {
     @State private var confirmPause = false
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 22) {
+        VStack(alignment: .leading, spacing: 28) {
             PageHeader(title: "Hi there", subtitle: "Here's how your iPhone and your AI helpers are doing.")
             ConnectionCard()
 
-            HStack(spacing: 14) {
+            GridRowCells {
                 StatTile(icon: "sparkles", value: "\(model.approvedClients.count)", label: "AI clients allowed",
-                         tint: Theme.coralText)
+                         strong: model.approvedClients.count > 0)
+                VRule()
                 StatTile(icon: "bell.badge.fill", value: "\(model.pendingCount)", label: "Waiting for you",
-                         tint: model.pendingCount > 0 ? Theme.amberText : Theme.inkSoft)
+                         strong: model.pendingCount > 0)
+                    .contentShape(Rectangle())
                     .onTapGesture { model.section = .access }
+                VRule()
                 StatTile(icon: model.isPaused ? "pause.circle.fill" : "hand.tap.fill", value: controlValue,
-                         label: controlLabel, tint: model.isPaused ? Theme.danger : Theme.mintText)
+                         label: controlLabel, strong: model.isPaused || model.status?.control?.active == true)
             }
 
             Card(padding: 22) {
                 VStack(alignment: .leading, spacing: 14) {
                     HStack(alignment: .firstTextBaseline) {
-                        Text("Emergency brake").font(Theme.display(18, .semibold))
+                        Text("Emergency brake").font(Theme.display(20)).displayTracking(20)
                         Spacer()
-                        if model.isPaused { Chip(text: "Paused", icon: "pause.fill", tint: Theme.danger) }
+                        if model.isPaused { Chip(text: "Paused", icon: "pause.fill", tint: Theme.accentText) }
                     }
                     Text(model.isPaused
                          ? "AI clients can't see or use your iPhone until you resume."
                          : "Pause instantly stops AI clients from seeing or using your iPhone, until you resume it here.")
-                        .font(.system(size: 13)).foregroundStyle(Theme.inkSoft)
+                        .font(Theme.text(14)).foregroundStyle(Theme.inkSoft)
                     if model.isPaused {
                         Button { Task { await model.resume() } } label: {
                             Label("Resume AI control", systemImage: "play.fill")
                         }
-                        .buttonStyle(PillButtonStyle(fill: Theme.mint, large: true))
+                        .buttonStyle(RuleButtonStyle(role: .primary, full: true))
                     } else {
                         Button { confirmPause = true } label: {
                             Label("Pause AI control", systemImage: "hand.raised.fill")
                         }
-                        .buttonStyle(PillButtonStyle(fill: Theme.danger, text: .white, large: true))
+                        .buttonStyle(RuleButtonStyle(role: .danger, full: true))
                         .keyboardShortcut(".", modifiers: .command)
                     }
                 }
@@ -70,22 +73,23 @@ private struct ConnectionCard: View {
 
     var body: some View {
         let c = model.status?.connection
-        Card(padding: 26) {
-            HStack(spacing: 24) {
+        Card(padding: 24) {
+            HStack(alignment: .top, spacing: 24) {
                 PhoneBadge(color: model.health.color, busy: model.health == .busy)
                 VStack(alignment: .leading, spacing: 8) {
-                    Text(model.headline).font(Theme.display(26)).fixedSize(horizontal: false, vertical: true)
+                    Text(model.headline).font(Theme.display(26)).displayTracking(26)
+                        .fixedSize(horizontal: false, vertical: true)
                     if let message = c?.message, message.lowercased() != "connected" {
-                        Text(message).font(.system(size: 13)).foregroundStyle(Theme.inkSoft)
+                        Text(message).font(Theme.text(14)).foregroundStyle(Theme.inkSoft)
                     } else {
                         Text("AI agents can see and use it when you allow them.")
-                            .font(.system(size: 13)).foregroundStyle(Theme.inkSoft)
+                            .font(Theme.text(14)).foregroundStyle(Theme.inkSoft)
                     }
                     HStack(spacing: 6) {
                         Chip(text: "iPhone", icon: "iphone")
                         if let v = c?.product_version { Chip(text: "iOS \(v)", icon: "apple.logo") }
                         if let t = c?.transport { Chip(text: t == "usb" ? "USB cable" : t.capitalized, icon: t == "usb" ? "cable.connector" : "wifi") }
-                        if c?.developer_mode == true { Chip(text: "Developer Mode", icon: "hammer.fill", tint: Theme.mintText) }
+                        if c?.developer_mode == true { Chip(text: "Developer Mode", icon: "hammer.fill", tint: Theme.ink) }
                     }
                     .padding(.top, 4)
                 }
@@ -95,23 +99,22 @@ private struct ConnectionCard: View {
     }
 }
 
-/// A phone glyph sitting in a softly glowing ring that breathes while connecting.
+/// The phone glyph in a square 2px ink frame, with the status square on its corner. The square
+/// blinks while connecting.
 struct PhoneBadge: View {
     var color: Color
     var busy = false
-    @State private var pulse = false
 
     var body: some View {
-        ZStack {
-            Circle().fill(color.opacity(0.14)).frame(width: 104, height: 104)
-                .scaleEffect(busy && pulse ? 1.08 : 1)
-            Circle().strokeBorder(color.opacity(0.5), lineWidth: 2).frame(width: 82, height: 82)
-            Image(systemName: "iphone.gen3").font(.system(size: 38, weight: .light)).foregroundStyle(Theme.ink)
-            Circle().fill(color).frame(width: 18, height: 18)
-                .overlay(Circle().strokeBorder(Theme.surface, lineWidth: 3))
-                .offset(x: 30, y: 30)
+        ZStack(alignment: .bottomTrailing) {
+            Rectangle().strokeBorder(Theme.ink, lineWidth: Theme.rule)
+                .frame(width: 88, height: 88)
+                .overlay(Image(systemName: "iphone.gen3").font(.system(size: 38, weight: .light)).foregroundStyle(Theme.ink))
+            StatusDot(color: color, size: 16, blink: busy)
+                .padding(3).background(Theme.canvas)
+                .offset(x: 8, y: 8)
         }
-        .onAppear { withAnimation(.easeInOut(duration: 1.1).repeatForever()) { pulse = true } }
+        .padding(.trailing, 8).padding(.bottom, 8)
     }
 }
 
@@ -119,15 +122,18 @@ private struct StatTile: View {
     var icon: String
     var value: String
     var label: String
-    var tint: Color
+    var strong: Bool
 
     var body: some View {
-        Card(padding: 16) {
-            VStack(alignment: .leading, spacing: 6) {
-                Image(systemName: icon).foregroundStyle(tint)
-                Text(value).font(Theme.display(24)).lineLimit(1).minimumScaleFactor(0.6)
-                Text(label).font(.system(size: 12)).foregroundStyle(Theme.inkSoft)
-            }
+        VStack(alignment: .leading, spacing: 6) {
+            Image(systemName: icon).foregroundStyle(strong ? Theme.accentText : Theme.inkSoft)
+            Text(value).font(Theme.display(34).monospacedDigit()).displayTracking(34)
+                .foregroundStyle(strong ? Theme.accent : Theme.ink)
+                .lineLimit(1).minimumScaleFactor(0.7)
+            Text(label).font(Theme.text(12.5)).foregroundStyle(Theme.inkSoft)
+                .fixedSize(horizontal: false, vertical: true)
         }
+        .padding(.horizontal, 18).padding(.vertical, 18)
+        .frame(maxWidth: .infinity, alignment: .leading)
     }
 }

@@ -10,8 +10,8 @@ APP=build/Thumbly.app
 rm -rf "$APP"
 mkdir -p "$APP/Contents/MacOS" "$APP/Contents/Resources"
 cp "$BIN" "$APP/Contents/MacOS/Thumbly"
-cp Resources/SpaceGrotesk.ttf "$APP/Contents/Resources/"
-cp Resources/OFL.txt "$APP/Contents/Resources/SpaceGrotesk-OFL.txt"
+cp Resources/SchibstedGrotesk.ttf "$APP/Contents/Resources/"
+cp Resources/OFL.txt "$APP/Contents/Resources/SchibstedGrotesk-OFL.txt"
 cp -R Resources/ClientIcons "$APP/Contents/Resources/"
 
 if [ ! -f build/AppIcon.icns ] || [ scripts/make_icon.swift -nt build/AppIcon.icns ]; then
@@ -37,7 +37,7 @@ cat > "$APP/Contents/Info.plist" <<PLIST
   <key>LSUIElement</key><false/>
   <key>LSApplicationCategoryType</key><string>public.app-category.utilities</string>
   <key>NSHighResolutionCapable</key><true/>
-  <key>NSHumanReadableCopyright</key><string>Thumbly. Space Grotesk font under SIL OFL 1.1.</string>
+  <key>NSHumanReadableCopyright</key><string>Thumbly. Schibsted Grotesk font under SIL OFL 1.1.</string>
   <key>NSAppTransportSecurity</key>
   <dict><key>NSAllowsLocalNetworking</key><true/></dict>
   <key>CFBundleURLTypes</key>

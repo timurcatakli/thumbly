@@ -36,7 +36,7 @@ struct RootView: View {
     }
 
     private var page: some View {
-        content.padding(32).frame(maxWidth: 760).frame(maxWidth: .infinity)
+        content.padding(32).frame(maxWidth: 760, alignment: .leading).frame(maxWidth: .infinity, alignment: .leading)
     }
 
     @ViewBuilder private var content: some View {
@@ -53,16 +53,17 @@ private struct Sidebar: View {
     @Environment(AppModel.self) private var model
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 4) {
+        VStack(alignment: .leading, spacing: 0) {
             HStack(spacing: 10) {
                 BrandMark(size: 34)
-                VStack(alignment: .leading, spacing: 0) {
-                    Text("Thumbly").font(Theme.display(20))
-                    Text("your thumb, for AI").font(.system(size: 10.5)).foregroundStyle(Theme.inkSoft)
+                VStack(alignment: .leading, spacing: 1) {
+                    Text("Thumbly").font(Theme.display(20)).displayTracking(20)
+                    Text("your thumb, for AI").font(Theme.text(11)).foregroundStyle(Theme.inkSoft)
                 }
             }
-            .padding(.top, 26).padding(.bottom, 20).padding(.horizontal, 6)
+            .padding(.horizontal, 20).padding(.top, 26).padding(.bottom, 20)
 
+            Rule(color: Theme.divider)
             ForEach(Section.allCases) { section in
                 NavItem(section: section, selected: model.section == section,
                         badge: section == .access ? model.pendingCount : 0,
@@ -72,19 +73,20 @@ private struct Sidebar: View {
                 }
             }
             Spacer()
-            HStack(spacing: 8) {
-                StatusDot(color: model.health.color, size: 8)
-                Text(model.headline).font(.system(size: 11.5, weight: .medium)).foregroundStyle(Theme.inkSoft)
+            Rule(color: Theme.divider)
+            HStack(alignment: .firstTextBaseline, spacing: 8) {
+                StatusDot(color: model.health.color, size: 8, blink: model.health == .busy)
+                Text(model.headline).font(Theme.text(12, .medium)).foregroundStyle(Theme.ink)
                     .lineLimit(2)
             }
-            .padding(12)
+            .padding(.horizontal, 20).padding(.vertical, 14)
             .frame(maxWidth: .infinity, alignment: .leading)
-            .background(Theme.surface.opacity(0.7), in: RoundedRectangle(cornerRadius: 12, style: .continuous))
         }
-        .padding(14)
         .frame(width: 214)
         .frame(maxHeight: .infinity)
         .background(Theme.sunken)
+        // Over the nav rows, and up under the title bar like the fill.
+        .overlay(alignment: .trailing) { VRule().ignoresSafeArea() }
         .foregroundStyle(Theme.ink)
     }
 }
@@ -104,25 +106,23 @@ private struct NavItem: View {
                 Text(section == .status && setupDot ? "Set up" : section.title)
                 Spacer()
                 if badge > 0 {
-                    Text("\(badge)").font(.system(size: 11, weight: .bold)).foregroundStyle(Theme.onAccent)
-                        .padding(.horizontal, 7).padding(.vertical, 2).background(Theme.coral, in: Capsule())
+                    CountBadge(count: badge)
                 } else if setupDot {
-                    StatusDot(color: Theme.amber, size: 7)
+                    StatusDot(color: Theme.accent, size: 7)
                 }
             }
-            .font(.system(size: 13.5, weight: selected ? .semibold : .regular))
+            .font(Theme.text(13.5, selected ? .heavy : .regular))
             .foregroundStyle(selected ? Theme.ink : Theme.inkSoft)
-            .padding(.horizontal, 12).padding(.vertical, 9)
-            .background(
-                RoundedRectangle(cornerRadius: 11, style: .continuous)
-                    .fill(selected ? Theme.surface : (hover ? Theme.surface.opacity(0.5) : .clear)))
+            .padding(.horizontal, 20).padding(.vertical, 10)
+            .background(selected ? Theme.surface : (hover ? Theme.hover : .clear))
             .overlay(alignment: .leading) {
-                if selected { Capsule().fill(Theme.coral).frame(width: 3, height: 18).offset(x: 1) }
+                if selected { Rectangle().fill(Theme.accent).frame(width: 3, height: 18) }
             }
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
         .onHover { hover = $0 }
+        .accessibilityAddTraits(selected ? .isSelected : [])
     }
 }
 
@@ -130,15 +130,17 @@ private struct Toast: View {
     @Environment(AppModel.self) private var model
     var body: some View {
         if let toast = model.toast {
-            Label(toast, systemImage: "checkmark.circle.fill")
-                .font(.system(size: 13, weight: .medium))
-                .foregroundStyle(Theme.ink)
-                .padding(.horizontal, 16).padding(.vertical, 10)
-                .background(Theme.surface, in: Capsule())
-                .overlay(Capsule().strokeBorder(Theme.mint, lineWidth: 1.5))
-                .shadow(color: .black.opacity(0.12), radius: 12, y: 4)
-                .padding(.bottom, 22)
-                .transition(.move(edge: .bottom).combined(with: .opacity))
+            HStack(spacing: 10) {
+                Rectangle().fill(Theme.accent).frame(width: 8, height: 8)
+                Text(toast)
+            }
+            .font(Theme.text(13, .semibold))
+            .foregroundStyle(Theme.ink)
+            .padding(.horizontal, 16).padding(.vertical, 10)
+            .background(Theme.canvas)
+            .overlay(Rectangle().strokeBorder(Theme.ink, lineWidth: Theme.rule))
+            .padding(.bottom, 22)
+            .transition(.move(edge: .bottom).combined(with: .opacity))
         }
     }
 }

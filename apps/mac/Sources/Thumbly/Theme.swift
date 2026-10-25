@@ -2,60 +2,96 @@ import AppKit
 import CoreText
 import SwiftUI
 
-/// Thumbly's palette: deep ink navy, warm coral for primary actions, mint for "all good",
-/// amber for "needs a hand", red for Pause. Every color has a light and a dark variant.
+/// Thumbly's "Modernist" palette: ink on off-white with one red accent. No second hue: status
+/// collapses to ink (fine) and accent (look here). Every color has a light and a dark variant.
 enum Theme {
     // Surfaces
-    static let canvas = dynamic(light: 0xF7F3EC, dark: 0x0E1326)      // window background (warm paper / night ink)
-    static let surface = dynamic(light: 0xFFFFFF, dark: 0x171E3A)     // cards
-    static let sunken = dynamic(light: 0xEFE9DF, dark: 0x0A0F1F)      // sidebar, wells
-    static let hairline = dynamic(light: 0xE2DACB, dark: 0x262F55)
+    static let canvas = dynamic(light: 0xF3F2F2, dark: 0x181616)      // window background
+    static let surface = dynamic(light: 0xEAE9E9, dark: 0x232121)     // wells, code blocks, hover fill
+    static let sunken = dynamic(light: 0xEAE7E7, dark: 0x201E1D)      // sidebar
 
-    // Text (all ≥ 4.5:1 on canvas and surface)
-    static let ink = dynamic(light: 0x18203D, dark: 0xF2EEE6)
-    static let inkSoft = dynamic(light: 0x545D7C, dark: 0xA6AECB)
+    // Text (inkSoft stays ≥ 4.5:1 on canvas, surface and sunken)
+    static let ink = dynamic(light: 0x201E1D, dark: 0xF3F2F2)
+    static let inkSoft = dynamic(light: 0x201E1D, dark: 0xF3F2F2, alpha: 0.72)
+    static let divider = dynamic(light: 0x201E1D, dark: 0xF3F2F2, alpha: 0.40, darkAlpha: 0.32)
+    static let hover = dynamic(light: 0x201E1D, dark: 0xF3F2F2, alpha: 0.04)
 
-    // Brand + status
-    static let coral = dynamic(light: 0xFF7A59, dark: 0xFF8B6B)       // primary button fill (ink text on top)
-    static let coralText = dynamic(light: 0xB3401F, dark: 0xFF9C80)   // coral used as text
-    static let mint = dynamic(light: 0x18A877, dark: 0x45DDA8)
-    static let mintText = dynamic(light: 0x0E7351, dark: 0x5FE6B6)
-    static let amber = dynamic(light: 0xF2A93B, dark: 0xF6BC5C)
-    static let amberText = dynamic(light: 0x8A5600, dark: 0xF6C46E)
-    static let danger = dynamic(light: 0xD7373D, dark: 0xF0555A)
-    static let onAccent = Color(hex: 0x18203D)                          // text on coral / mint / amber fills
+    // The one accent. Base red is for marks and 24pt+ numerals; small text uses accentText. Fills
+    // that carry a label use accentFill, a step deeper in light mode, so the label clears 4.5:1;
+    // dark mode puts dark ink on the red instead.
+    static let accent = dynamic(light: 0xEC3013, dark: 0xFF563C)
+    static let accentFill = dynamic(light: 0xCC2A10, dark: 0xFF563C)
+    static let accentPressed = dynamic(light: 0xB82410, dark: 0xFF9783)
+    static let accentText = dynamic(light: 0xAE1800, dark: 0xFF9783)
+    static let onAccent = dynamic(light: 0xF3F2F2, dark: 0x181616)
 
-    static let brandGradient = LinearGradient(
-        colors: [Color(hex: 0x1B2448), Color(hex: 0x3A2E5E), Color(hex: 0xFF7A59)],
-        startPoint: .topLeading, endPoint: .bottomTrailing)
+    // Structure: strong rules organise the page, hairlines separate rows.
+    static let rule: CGFloat = 2
+    static let hairline: CGFloat = 1
 
-    // Type: Space Grotesk for headings, SF Pro for everything else.
-    static let fontFamily = "Space Grotesk"
-    static func display(_ size: CGFloat, _ weight: Font.Weight = .bold) -> Font {
-        fontRegistered ? .custom(fontFamily, size: size).weight(weight) : .system(size: size, weight: weight, design: .rounded)
+    // Type: Schibsted Grotesk for everything, SF Mono for code.
+    static let fontName = "SchibstedGrotesk-Regular"
+
+    /// Headings: ExtraBold by default.
+    static func display(_ size: CGFloat, _ weight: Font.Weight = .heavy) -> Font { text(size, weight) }
+
+    static func text(_ size: CGFloat, _ weight: Font.Weight = .regular) -> Font {
+        guard fontRegistered else { return .system(size: size, weight: weight) }
+        // Set the variable font's weight axis directly: SwiftUI's .weight() can't reach it reliably.
+        let descriptor = NSFontDescriptor(fontAttributes: [
+            .name: fontName,
+            .variation: [NSNumber(value: wghtAxis): NSNumber(value: axisValue(weight))],
+        ])
+        return NSFont(descriptor: descriptor, size: size).map { Font($0) } ?? .system(size: size, weight: weight)
+    }
+
+    static func mono(_ size: CGFloat = 12) -> Font { .system(size: size, design: .monospaced) }
+
+    private static let wghtAxis: UInt32 = 0x7767_6874 // 'wght'
+    private static func axisValue(_ weight: Font.Weight) -> Double {
+        switch weight {
+        case .black: 900
+        case .heavy: 800
+        case .bold: 700
+        case .semibold: 600
+        case .medium: 500
+        default: 400 // The font's lightest master.
+        }
     }
 
     nonisolated(unsafe) private(set) static var fontRegistered = false
     static func registerFonts() {
         let candidates = [
-            Bundle.main.url(forResource: "SpaceGrotesk", withExtension: "ttf"),
+            Bundle.main.url(forResource: "SchibstedGrotesk", withExtension: "ttf"),
             URL(fileURLWithPath: #filePath).deletingLastPathComponent()
-                .appendingPathComponent("../../Resources/SpaceGrotesk.ttf").standardized,
+                .appendingPathComponent("../../Resources/SchibstedGrotesk.ttf").standardized,
         ].compactMap { $0 }
         for url in candidates where FileManager.default.fileExists(atPath: url.path) {
             var error: Unmanaged<CFError>?
-            if CTFontManagerRegisterFontsForURL(url as CFURL, .process, &error) || NSFont(name: "SpaceGrotesk-Regular", size: 12) != nil {
+            if CTFontManagerRegisterFontsForURL(url as CFURL, .process, &error) || NSFont(name: fontName, size: 12) != nil {
                 fontRegistered = true
                 return
             }
         }
     }
 
-    private static func dynamic(light: UInt32, dark: UInt32) -> Color {
+    private static func dynamic(light: UInt32, dark: UInt32, alpha: CGFloat = 1, darkAlpha: CGFloat? = nil) -> Color {
         Color(nsColor: NSColor(name: nil) { appearance in
-            appearance.bestMatch(from: [.darkAqua, .aqua]) == .darkAqua ? NSColor(hex: dark) : NSColor(hex: light)
+            appearance.bestMatch(from: [.darkAqua, .aqua]) == .darkAqua
+                ? NSColor(hex: dark).withAlphaComponent(darkAlpha ?? alpha)
+                : NSColor(hex: light).withAlphaComponent(alpha)
         })
     }
+}
+
+extension View {
+    /// Small uppercase label above a title or heading a table column.
+    func kicker(_ color: Color = Theme.accentText) -> some View {
+        font(Theme.text(11, .semibold)).tracking(0.88).textCase(.uppercase).foregroundStyle(color)
+    }
+
+    /// Display titles run tight: -0.02em.
+    func displayTracking(_ size: CGFloat) -> some View { tracking(-0.02 * size) }
 }
 
 extension NSColor {

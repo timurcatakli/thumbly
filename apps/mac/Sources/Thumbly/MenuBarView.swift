@@ -10,8 +10,8 @@ struct MenuBarView: View {
                 VStack(alignment: .leading, spacing: 2) {
                     Text("Thumbly").font(Theme.display(15))
                     HStack(spacing: 6) {
-                        StatusDot(color: model.health.color, size: 7)
-                        Text(model.headline).font(.system(size: 11.5)).foregroundStyle(Theme.inkSoft)
+                        StatusDot(color: model.health.color, size: 7, blink: model.health == .busy)
+                        Text(model.headline).font(Theme.text(12)).foregroundStyle(Theme.inkSoft)
                     }
                 }
             }
@@ -21,14 +21,15 @@ struct MenuBarView: View {
                     model.handle(url: URL(string: "thumbly://access" + (model.consents.first.map { "?r=\($0.handle)" } ?? ""))!)
                 } label: {
                     HStack {
-                        Image(systemName: "bell.badge.fill").foregroundStyle(Theme.amberText)
+                        Image(systemName: "bell.badge.fill").foregroundStyle(Theme.accentText)
                         Text(model.pendingCount == 1 ? "1 request waiting" : "\(model.pendingCount) requests waiting")
                         Spacer()
                         Image(systemName: "chevron.right").foregroundStyle(Theme.inkSoft)
                     }
-                    .font(.system(size: 12.5, weight: .medium))
+                    .font(Theme.text(12.5, .semibold))
                     .padding(10)
-                    .background(Theme.amber.opacity(0.15), in: RoundedRectangle(cornerRadius: 10))
+                    .background(Theme.surface)
+                    .overlay(alignment: .leading) { Rectangle().fill(Theme.accent).frame(width: 3) }
                     .contentShape(Rectangle())
                 }
                 .buttonStyle(.plain)
@@ -38,21 +39,22 @@ struct MenuBarView: View {
                 Button { Task { await model.resume() } } label: {
                     Label("Resume AI control", systemImage: "play.fill")
                 }
-                .buttonStyle(PillButtonStyle(fill: Theme.mint, large: true))
+                .buttonStyle(RuleButtonStyle(role: .primary, full: true))
                 .disabled(model.reachable != true)
             } else {
                 Button { Task { await model.pause() } } label: {
                     Label("Pause AI control", systemImage: "hand.raised.fill")
                 }
-                .buttonStyle(PillButtonStyle(fill: Theme.danger, text: .white, large: true))
+                .buttonStyle(RuleButtonStyle(role: .danger, full: true))
                 .disabled(model.reachable != true)
             }
 
-            Divider()
+            Rule(color: Theme.divider)
             HStack {
-                Button("Open Thumbly") { model.showWindow() }.buttonStyle(.quiet)
+                Button("Open Thumbly") { model.showWindow() }.buttonStyle(.secondary)
                 Spacer()
                 Button("Quit") { NSApp.terminate(nil) }.buttonStyle(.plain).foregroundStyle(Theme.inkSoft)
+                    .font(Theme.text(13))
                     .keyboardShortcut("q")
             }
         }

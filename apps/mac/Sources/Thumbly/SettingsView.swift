@@ -10,36 +10,40 @@ struct SettingsView: View {
 
     var body: some View {
         let info = model.info
-        VStack(alignment: .leading, spacing: 18) {
+        VStack(alignment: .leading, spacing: 28) {
             PageHeader(title: "Settings", subtitle: "Connect AI clients, switch phones, and keep things tidy.")
 
             Card {
-                VStack(alignment: .leading, spacing: 12) {
+                VStack(alignment: .leading, spacing: 14) {
                     row("Connect an AI client", "Pick yours, run or paste this once, then ask it to use your iPhone.")
-                    LazyVGrid(columns: [GridItem(.adaptive(minimum: 150), spacing: 8)], spacing: 8) {
+                    // Negative spacing overlaps the 1px frames so neighbouring tiles share one border.
+                    LazyVGrid(columns: [GridItem(.adaptive(minimum: 150), spacing: -Theme.hairline)],
+                              spacing: -Theme.hairline) {
                         ForEach(Client.allCases) { option in
                             ClientTile(client: option, selected: option == client) { clientID = option.rawValue }
+                                .zIndex(option == client ? 1 : 0)
                         }
                     }
-                    Text(client.how).font(.system(size: 12.5)).foregroundStyle(Theme.inkSoft)
+                    Text(client.how).font(Theme.text(13)).foregroundStyle(Theme.inkSoft)
                         .fixedSize(horizontal: false, vertical: true)
                     if let setup = client.setup(local: mcpURL, remote: info?.public_url.map { "\($0)/mcp" }) {
                         HStack(alignment: .center) {
-                            Text(setup).font(.system(size: 12, design: .monospaced)).textSelection(.enabled)
+                            Text(setup).font(Theme.mono()).textSelection(.enabled)
                                 .fixedSize(horizontal: false, vertical: true)
                             Spacer()
                             Button(client.isCommand ? "Copy command" : "Copy") { copy(setup) }.buttonStyle(.primary)
                         }
-                        .padding(12)
-                        .background(Theme.sunken, in: RoundedRectangle(cornerRadius: 10, style: .continuous))
+                        .padding(14)
+                        .background(Theme.surface)
                     } else {
                         Chip(text: "Needs remote access: set public_url in Thumbly's settings file", icon: "globe",
-                             tint: Theme.amberText)
+                             tint: Theme.accentText)
                     }
                     HStack(spacing: 6) {
                         Chip(text: "MCP \(info?.mcp_url ?? "—")", icon: "point.3.connected.trianglepath.dotted")
                         Chip(text: "Version \(info?.version ?? "—")", icon: "tag")
-                        Button("Copy URL") { copy(info?.mcp_url ?? "") }.buttonStyle(.link).font(.system(size: 12))
+                        Button("Copy URL") { copy(info?.mcp_url ?? "") }.buttonStyle(RuleButtonStyle(role: .ghost, small: true))
+                            .padding(.leading, 4)
                     }
                 }
             }
@@ -48,7 +52,7 @@ struct SettingsView: View {
                 HStack {
                     row("Use another iPhone", "Forget this iPhone so you can plug in a different one.")
                     Spacer()
-                    Button("Forget iPhone…") { confirmUnbind = true }.buttonStyle(.quiet)
+                    Button("Forget iPhone…") { confirmUnbind = true }.buttonStyle(.secondary)
                 }
             }
 
@@ -56,11 +60,11 @@ struct SettingsView: View {
                 HStack {
                     row("Diagnostics", "Save a report to share when something isn't working. Identifiers are redacted.")
                     Spacer()
-                    Button("Export…") { Task { await exportDiagnostics() } }.buttonStyle(.quiet)
+                    Button("Export…") { Task { await exportDiagnostics() } }.buttonStyle(.secondary)
                 }
             }
 
-            Card(stroke: Theme.danger.opacity(0.5)) {
+            Card(stroke: Theme.accent) {
                 HStack {
                     row("Start over", "Erase the paired iPhone, every AI client and all activity.")
                     Spacer()
@@ -84,8 +88,8 @@ struct SettingsView: View {
 
     private func row(_ title: String, _ detail: String) -> some View {
         VStack(alignment: .leading, spacing: 3) {
-            Text(title).font(Theme.display(16, .semibold))
-            Text(detail).font(.system(size: 12.5)).foregroundStyle(Theme.inkSoft)
+            Text(title).font(Theme.display(18)).displayTracking(18)
+            Text(detail).font(Theme.text(13)).foregroundStyle(Theme.inkSoft)
         }
     }
 
@@ -173,6 +177,7 @@ private struct ClientTile: View {
     var client: Client
     var selected: Bool
     var action: () -> Void
+    @State private var hover = false
 
     var body: some View {
         Button(action: action) {
@@ -186,19 +191,19 @@ private struct ClientTile: View {
                 }
                 .frame(width: 20, height: 20)
                 .foregroundStyle(Theme.ink)
-                Text(client.title).font(.system(size: 13, weight: .semibold)).foregroundStyle(Theme.ink)
+                Text(client.title).font(Theme.text(13, selected ? .heavy : .semibold)).foregroundStyle(Theme.ink)
                     .minimumScaleFactor(0.8)
                     .lineLimit(1)
                 Spacer(minLength: 0)
             }
-            .padding(.horizontal, 12).padding(.vertical, 10)
-            .background(selected ? Theme.surface : Theme.sunken,
-                        in: RoundedRectangle(cornerRadius: 12, style: .continuous))
-            .overlay(RoundedRectangle(cornerRadius: 12, style: .continuous)
-                .strokeBorder(selected ? Theme.coral : Theme.hairline, lineWidth: selected ? 2 : 1))
-            .contentShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+            .padding(.horizontal, 12).padding(.vertical, 11)
+            .background(selected ? Theme.surface : (hover ? Theme.hover : .clear))
+            .overlay(Rectangle().strokeBorder(Theme.divider, lineWidth: Theme.hairline))
+            .overlay { if selected { Rectangle().strokeBorder(Theme.accent, lineWidth: Theme.rule) } }
+            .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
+        .onHover { hover = $0 }
         .accessibilityAddTraits(selected ? .isSelected : [])
     }
 }
@@ -210,14 +215,17 @@ private struct ResetSheet: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 14) {
-            Image(systemName: "exclamationmark.triangle.fill").font(.system(size: 28)).foregroundStyle(Theme.danger)
-            Text("Reset Thumbly?").font(Theme.display(22))
+            Image(systemName: "exclamationmark.triangle.fill").font(.system(size: 28)).foregroundStyle(Theme.accent)
+            Text("Reset Thumbly?").font(Theme.display(22)).displayTracking(22)
+            Rule()
             Text("This erases the paired iPhone, all AI clients and the activity log, then restarts Thumbly. Type **Thumbly** to confirm.")
-                .font(.system(size: 13)).foregroundStyle(Theme.inkSoft).fixedSize(horizontal: false, vertical: true)
-            TextField("Thumbly", text: $typed).textFieldStyle(.roundedBorder)
+                .font(Theme.text(14)).foregroundStyle(Theme.inkSoft).fixedSize(horizontal: false, vertical: true)
+            TextField("Thumbly", text: $typed).textFieldStyle(.plain).font(Theme.text(14))
+                .padding(.horizontal, 10).padding(.vertical, 8)
+                .background(Theme.surface)
+                .overlay(Rectangle().strokeBorder(Theme.divider, lineWidth: Theme.hairline))
             HStack {
-                Spacer()
-                Button("Cancel") { dismiss() }.buttonStyle(.quiet).keyboardShortcut(.cancelAction)
+                Button("Cancel") { dismiss() }.buttonStyle(.secondary).keyboardShortcut(.cancelAction)
                 Button("Erase everything") {
                     let name = typed
                     dismiss()

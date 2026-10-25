@@ -27,22 +27,18 @@ struct SetupView: View {
 
     var body: some View {
         let current = currentStep
-        VStack(alignment: .leading, spacing: 22) {
+        VStack(alignment: .leading, spacing: 28) {
             PageHeader(title: "Let's set up your iPhone", subtitle: "Four quick steps. Keep your iPhone unlocked and nearby.")
             SetupHero(step: current, index: current.rawValue, count: Step.allCases.count, hint: hint(for: current))
-            Card(padding: 8) {
-                VStack(spacing: 0) {
-                    ForEach(Step.allCases, id: \.self) { step in
-                        StepRow(step: step, state: step.rawValue < current.rawValue ? .done : (step == current ? .now : .later)) {
-                            if step == current { action(for: step) }
-                        }
-                        if step != .ready {
-                            Capsule().fill(step.rawValue < current.rawValue ? Theme.mint : Theme.hairline)
-                                .frame(width: 2, height: 14).padding(.leading, 34)
-                                .frame(maxWidth: .infinity, alignment: .leading)
-                        }
+            VStack(spacing: 0) {
+                Rule()
+                ForEach(Step.allCases, id: \.self) { step in
+                    if step.rawValue > 0 { Rule(color: Theme.divider, weight: Theme.hairline) }
+                    StepRow(step: step, state: step.rawValue < current.rawValue ? .done : (step == current ? .now : .later)) {
+                        if step == current { action(for: step) }
                     }
                 }
+                Rule()
             }
             .animation(.spring(response: 0.45, dampingFraction: 0.85), value: current)
         }
@@ -101,7 +97,7 @@ struct SetupView: View {
     }
 
     private func hint(_ text: String) -> some View {
-        Text(text).font(.system(size: 13)).foregroundStyle(Theme.inkSoft).fixedSize(horizontal: false, vertical: true)
+        Text(text).font(Theme.text(14)).foregroundStyle(Theme.inkSoft).fixedSize(horizontal: false, vertical: true)
     }
 }
 
@@ -114,45 +110,49 @@ private struct StepRow<Detail: View>: View {
     var body: some View {
         HStack(alignment: .top, spacing: 16) {
             ZStack {
-                if state == .now { PulseRing() }
-                Circle().fill(fill).frame(width: 40, height: 40)
+                Rectangle().fill(fill).frame(width: 40, height: 40)
+                    .overlay { if state == .later { Rectangle().strokeBorder(Theme.divider, lineWidth: Theme.hairline) } }
                 Image(systemName: state == .done ? "checkmark" : step.icon)
                     .font(.system(size: 16, weight: .semibold))
-                    .foregroundStyle(state == .later ? Theme.inkSoft : Theme.onAccent)
+                    .foregroundStyle(iconColor)
+                if state == .now { BlinkMark().offset(x: 20, y: -20) }
             }
             VStack(alignment: .leading, spacing: 8) {
-                Text(step.title).font(Theme.display(17, state == .now ? .bold : .medium))
+                Text(step.title).font(Theme.display(18, state == .now ? .heavy : .semibold))
                     .foregroundStyle(state == .later ? Theme.inkSoft : Theme.ink)
                     .padding(.top, 9)
                 detail
             }
             Spacer(minLength: 0)
-            if state == .done { Chip(text: "Done", icon: "checkmark", tint: Theme.mintText).padding(.top, 9) }
+            if state == .done { Chip(text: "Done", icon: "checkmark", tint: Theme.ink).padding(.top, 9) }
         }
-        .padding(.horizontal, 15).padding(.vertical, 8)
-        .background(state == .now ? Theme.coral.opacity(0.08) : .clear, in: RoundedRectangle(cornerRadius: 14))
+        .padding(.horizontal, 16).padding(.vertical, 14)
+        .background(state == .now ? Theme.surface : .clear)
+        .overlay(alignment: .leading) {
+            if state == .now { Rectangle().fill(Theme.accent).frame(width: 3) }
+        }
     }
 
     private var fill: Color {
         switch state {
-        case .done: Theme.mint
-        case .now: Theme.coral
-        case .later: Theme.sunken
+        case .done: Theme.ink
+        case .now: Theme.accent
+        case .later: .clear
+        }
+    }
+
+    private var iconColor: Color {
+        switch state {
+        case .done: Theme.canvas
+        case .now: Theme.onAccent
+        case .later: Theme.inkSoft
         }
     }
 }
 
-/// A coral ring that keeps expanding and fading behind the current step's icon.
-private struct PulseRing: View {
-    @Environment(\.accessibilityReduceMotion) private var reduceMotion
-    @State private var go = false
-
+/// A small accent square blinking on the current step's corner.
+private struct BlinkMark: View {
     var body: some View {
-        Circle().strokeBorder(Theme.coral, lineWidth: 2).frame(width: 40, height: 40)
-            .scaleEffect(go ? 1.5 : 1).opacity(go ? 0 : 0.7)
-            .onAppear {
-                guard !reduceMotion else { return }
-                withAnimation(.easeOut(duration: 1.6).repeatForever(autoreverses: false)) { go = true }
-            }
+        StatusDot(color: Theme.accent, size: 8, blink: true).padding(2).background(Theme.surface)
     }
 }

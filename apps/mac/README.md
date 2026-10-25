@@ -37,38 +37,45 @@ The self-test refuses to run against port 8770. `GET /_log` on the stub lists ev
 
 | File | Role |
 | --- | --- |
-| `Theme.swift` | Palette (light/dark), heading font, font registration |
+| `Theme.swift` | Palette (light/dark), type scale, font registration |
 | `APIClient.swift` | Tolerant Codable models + async client (adds `x-thumbly-client: dashboard` to writes) |
 | `AppModel.swift` | `@Observable` state, polling (2.5 s with window, 8 s menu bar only), deep links, notifications |
 | `RootView.swift` | Sidebar + section routing, toast, error alert |
 | `StatusView` / `SetupView` / `AccessView` / `ActivityView` / `SettingsView` / `OfflineView` / `MenuBarView` | One screen each |
-| `Components.swift` | Brand mark, cards, chips, pill buttons, formatters |
+| `Components.swift` | Brand mark, ruled cards and tables, chips, rule buttons, square toggle, formatters |
 | `Snapshot.swift` | Dev-only snapshot and self-test modes (env-gated) |
 
 ## Design notes
 
-**Personality:** calm, trustworthy, a little playful: warm paper and night-ink surfaces, rounded cards,
-coral for the one thing you should do next, plain-language copy ("Waiting for you", "Emergency brake").
+**Personality:** "Modernist": flat, architectural, Swiss. A visible grid, zero corner radius, strong
+2px rules, everything flush left, ink on off-white with one red accent. No gradients, glows or soft
+shadows; alignment and divider weight do the organising. Plain-language copy ("Waiting for you",
+"Emergency brake").
 
 **Palette** (`Theme.swift`, light / dark):
 
 | Token | Light | Dark | Use |
 | --- | --- | --- | --- |
-| canvas | `#F7F3EC` | `#0E1326` | window background |
-| surface | `#FFFFFF` | `#171E3A` | cards |
-| sunken | `#EFE9DF` | `#0A0F1F` | sidebar, wells, chips |
-| ink / inkSoft | `#18203D` / `#545D7C` | `#F2EEE6` / `#A6AECB` | text (AA on canvas and surface) |
-| coral / coralText | `#FF7A59` / `#B3401F` | `#FF8B6B` / `#FF9C80` | primary action (ink text on fill) |
-| mint / mintText | `#18A877` / `#0E7351` | `#45DDA8` / `#5FE6B6` | connected, OK |
-| amber / amberText | `#F2A93B` / `#8A5600` | `#F6BC5C` / `#F6C46E` | needs attention |
-| danger | `#D7373D` | `#F0555A` | Pause, destructive (white text) |
+| canvas | `#F3F2F2` | `#181616` | window background |
+| surface | `#EAE9E9` | `#232121` | wells, code blocks, hover fill, selected nav |
+| sunken | `#EAE7E7` | `#201E1D` | sidebar |
+| ink / inkSoft | `#201E1D` / ink 72% | `#F3F2F2` / ink 72% | text (AA on canvas, surface, sunken) |
+| divider | ink 40% | ink 32% | 1px and 2px rules between cells and rows |
+| accent | `#EC3013` | `#FF563C` | active marks, status squares, 24pt+ numerals |
+| accentFill / accentPressed | `#CC2A10` / `#B82410` | `#FF563C` / `#FF9783` | fills that carry a label: buttons, count badges |
+| accentText | `#AE1800` | `#FF9783` | accent as small text |
+| onAccent | `#F3F2F2` | `#181616` | text on accentFill (≥ 4.5:1 in both modes) |
 
-**Type:** headings use [Space Grotesk](https://github.com/floriankarsten/space-grotesk) (variable TTF from
-`google/fonts/ofl/spacegrotesk`), licensed under the SIL Open Font License 1.1 — see
-`Resources/OFL.txt`, shipped in the bundle as `SpaceGrotesk-OFL.txt`. It's registered at launch with
-`CTFontManagerRegisterFontsForURL` (falls back to SF Rounded). Body text is SF Pro.
+Status is mono: ink when all is well, accent when the owner should look (busy blinks the square).
 
-**Icon:** `scripts/make_icon.swift` draws it with AppKit/CoreGraphics — a rounded square with an
-ink → plum → coral gradient, a tilted cream iPhone with a mint touch ripple and a peach thumb — and
-builds `AppIcon.icns` with `iconutil`. The menu bar uses the SF Symbol `hand.point.up.left.fill`
-(`hand.raised.fill` while paused).
+**Type:** [Schibsted Grotesk](https://github.com/schibsted/schibsted-grotesk) for everything (variable
+TTF from `google/fonts/ofl/schibstedgrotesk`), licensed under the SIL Open Font License 1.1 — see
+`Resources/OFL.txt`, shipped in the bundle as `SchibstedGrotesk-OFL.txt`. It's registered at launch
+with `CTFontManagerRegisterFontsForURL`, and `Theme.text` sets the `wght` axis directly (falls back to
+SF Pro). Titles are ExtraBold with -0.02em tracking, kickers 11pt semibold uppercase in accentText,
+numbers use tabular figures, code is SF Mono 12pt on a surface well.
+
+**Icon:** `scripts/make_icon.swift` draws the brand mark with AppKit — flat `#EC3013` to every edge
+(macOS masks it to its icon shape) with the `hand.point.up.left.fill` glyph in `#F3F2F2`, the same mark as `BrandMark` —
+and builds `AppIcon.icns` with `iconutil`. `Resources/Assets/` holds PNG and PDF exports of the mark.
+The menu bar uses the SF Symbol `hand.point.up.left.fill` (`hand.raised.fill` while paused).

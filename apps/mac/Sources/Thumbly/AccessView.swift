@@ -5,27 +5,29 @@ struct AccessView: View {
     @State private var removing: AIClient?
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 22) {
+        VStack(alignment: .leading, spacing: 28) {
             PageHeader(title: "Access", subtitle: "Decide which AI clients may see and use your iPhone.")
 
-            sectionTitle("Waiting for you", count: model.consents.count)
-            if model.consents.isEmpty {
-                Card { EmptyNote(icon: "tray", title: "No requests", detail: "When an AI client asks to connect, it shows up here.") }
-            } else {
-                ForEach(model.consents) { RequestCard(consent: $0) }
+            VStack(alignment: .leading, spacing: 14) {
+                SectionHeading(title: "Waiting for you", count: model.consents.count)
+                if model.consents.isEmpty {
+                    EmptyNote(icon: "tray", title: "No requests", detail: "When an AI client asks to connect, it shows up here.")
+                } else {
+                    ForEach(model.consents) { RequestCard(consent: $0) }
+                }
             }
 
-            sectionTitle("Allowed", count: model.approvedClients.count)
-            Card(padding: 6) {
+            VStack(alignment: .leading, spacing: 0) {
+                SectionHeading(title: "Allowed", count: model.approvedClients.count, ruled: model.approvedClients.isEmpty)
                 if model.approvedClients.isEmpty {
                     EmptyNote(icon: "person.2.slash", title: "Nobody yet", detail: "Approved AI clients will be listed here.")
                 } else {
-                    VStack(spacing: 0) {
-                        ForEach(Array(model.approvedClients.enumerated()), id: \.element.id) { index, client in
-                            if index > 0 { Divider().overlay(Theme.hairline).padding(.horizontal, 14) }
-                            ClientRow(client: client) { removing = client }
-                        }
+                    TableHeader(columns: [("Client", nil), ("", 80)], leading: 52)
+                    ForEach(Array(model.approvedClients.enumerated()), id: \.element.id) { index, client in
+                        if index > 0 { Rule(color: Theme.divider, weight: Theme.hairline) }
+                        ClientRow(client: client) { removing = client }
                     }
+                    Rule(color: Theme.divider, weight: Theme.hairline)
                 }
             }
         }
@@ -37,31 +39,22 @@ struct AccessView: View {
             Text("It loses access right away and must ask again.")
         }
     }
-
-    private func sectionTitle(_ title: String, count: Int) -> some View {
-        HStack(spacing: 8) {
-            Text(title).font(Theme.display(17, .semibold))
-            Text("\(count)").font(.system(size: 11.5, weight: .semibold)).foregroundStyle(Theme.inkSoft)
-                .padding(.horizontal, 7).padding(.vertical, 1).background(Theme.sunken, in: Capsule())
-        }
-    }
 }
 
 private struct RequestCard: View {
     @Environment(AppModel.self) private var model
     var consent: Consent
-    @State private var glow = false
 
     var body: some View {
         let highlighted = model.highlightedHandle == consent.handle
-        Card(padding: 22, stroke: highlighted ? Theme.coral : nil) {
+        Card(padding: 22, stroke: highlighted ? Theme.accent : Theme.ink) {
             VStack(alignment: .leading, spacing: 14) {
                 HStack(alignment: .top, spacing: 14) {
                     Image(systemName: "sparkles").font(.system(size: 20)).foregroundStyle(Theme.onAccent)
-                        .frame(width: 44, height: 44).background(Theme.amber, in: RoundedRectangle(cornerRadius: 12))
+                        .frame(width: 44, height: 44).background(Theme.accent)
                     VStack(alignment: .leading, spacing: 4) {
-                        Text(consent.client_name ?? "Unnamed client").font(Theme.display(19, .semibold))
-                        Text("wants to use your iPhone").font(.system(size: 13)).foregroundStyle(Theme.inkSoft)
+                        Text(consent.client_name ?? "Unnamed client").font(Theme.display(20)).displayTracking(20)
+                        Text("wants to use your iPhone").font(Theme.text(14)).foregroundStyle(Theme.inkSoft)
                     }
                     Spacer()
                     if let e = consent.expires_in { Chip(text: "expires in \(Fmt.duration(e))", icon: "timer") }
@@ -72,17 +65,13 @@ private struct RequestCard: View {
                 }
                 HStack(spacing: 8) {
                     Button("Allow for 24 hours") { decide(true, "24h") }.buttonStyle(.primary)
-                    Button("30 days") { decide(true, "30d") }.buttonStyle(.quiet)
-                    Button("Until I remove it") { decide(true, "never") }.buttonStyle(.quiet)
+                    Button("30 days") { decide(true, "30d") }.buttonStyle(.secondary)
+                    Button("Until I remove it") { decide(true, "never") }.buttonStyle(.secondary)
                     Spacer()
-                    Button("Deny") { decide(false, "24h") }.buttonStyle(.plain)
-                        .foregroundStyle(Theme.danger).font(.system(size: 13, weight: .semibold))
+                    Button("Deny") { decide(false, "24h") }.buttonStyle(.ghost)
                 }
             }
         }
-        .background(RoundedRectangle(cornerRadius: 18, style: .continuous).fill(Theme.surface)
-            .shadow(color: highlighted ? Theme.coral.opacity(glow ? 0.35 : 0.1) : .clear, radius: 16))
-        .onAppear { withAnimation(.easeInOut(duration: 1.2).repeatForever()) { glow = true } }
     }
 
     private func decide(_ allow: Bool, _ window: String) {
@@ -97,19 +86,22 @@ private struct ClientRow: View {
     var body: some View {
         HStack(spacing: 14) {
             Text(String((client.client_name ?? "?").prefix(1)).uppercased())
-                .font(Theme.display(16)).foregroundStyle(Theme.onAccent)
-                .frame(width: 38, height: 38).background(Theme.mint, in: Circle())
+                .font(Theme.display(16)).foregroundStyle(Theme.ink)
+                .frame(width: 38, height: 38)
+                .overlay(Rectangle().strokeBorder(Theme.ink, lineWidth: Theme.rule))
             VStack(alignment: .leading, spacing: 3) {
                 HStack(spacing: 6) {
-                    Text(client.client_name ?? client.client_id).font(.system(size: 14, weight: .semibold))
+                    Text(client.client_name ?? client.client_id).font(Theme.text(14, .bold))
                     if client.isSelf == true { Chip(text: "this app") }
                 }
-                Text(detail).font(.system(size: 12)).foregroundStyle(Theme.inkSoft)
+                Text(detail).font(Theme.text(12.5)).foregroundStyle(Theme.inkSoft)
             }
             Spacer()
-            Button("Remove", action: onRemove).buttonStyle(.quiet).disabled(client.isSelf == true)
+            Button("Remove", action: onRemove).buttonStyle(.secondary).disabled(client.isSelf == true)
+                .frame(width: 80, alignment: .leading)
         }
-        .padding(.horizontal, 14).padding(.vertical, 12)
+        .padding(.vertical, 12)
+        .rowHover()
     }
 
     private var detail: String {
