@@ -1,0 +1,13 @@
+{
+  "name": "Thumbly",
+  "short_name": "Thumbly",
+  "description": "Let AI agents see and control your iPhone from your Mac.",
+  "start_url": "/thumbly/",
+  "display": "browser",
+  "background_color": "#f3f2f2",
+  "theme_color": "#ec3013",
+  "icons": [
+    { "src": "icon.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "apple-touch-icon.png", "sizes": "180x180", "type": "image/png" }
+  ]
+}

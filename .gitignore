@@ -71,3 +71,6 @@ apps/mac/build/
 
 # Docs
 docs/
+
+# Landing page build output
+_site/

@@ -3,7 +3,7 @@ name: Deploy landing page
 on:
   push:
     branches: [main]
-    paths: ["site/**"]
+    paths: ["site/**", "VERSION", ".github/workflows/pages.yml"]
   workflow_dispatch:
 
 permissions:
@@ -24,8 +24,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: actions/configure-pages@v5
+      # Unpacks the exported bundle and adds the SEO and social tags; see site/build.py.
+      - run: python3 site/build.py _site
       - uses: actions/upload-pages-artifact@v3
         with:
-          path: site
+          path: _site
       - id: deployment
         uses: actions/deploy-pages@v4
