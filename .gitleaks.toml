@@ -1,0 +1,9 @@
+# Secret scan config for `gitleaks git` (CI job `secrets`). Extends the default rules and
+# allows only known non-secrets, so every new finding is either a real leak or a new entry here.
+[extend]
+useDefault = true
+
+[[allowlists]]
+description = "Loopback address of the Mac app's test stub, not a key"
+regexTarget = "line"
+regexes = ['''THUMBLY_API_URL=http://127\.0\.0\.1:\d+''']

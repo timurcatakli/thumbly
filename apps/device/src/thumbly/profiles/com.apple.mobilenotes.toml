@@ -1,0 +1,35 @@
+bundle_id = "com.apple.mobilenotes"
+name = "Notes"
+schemes = ["mobilenotes"]
+cold_launch_for_url = false
+text_input = "send_text"
+summary = "Plain text editor; the last open note reappears on launch. send_text pastes any Unicode, including new lines."
+
+quirks = ["Launch returns to the last open note, not the list."]
+
+[verified]
+date = "2026-09-29"
+app = "iOS 27.0"
+ios = "27.0"
+device = "iPhone14,5"
+
+[workflows.append_text]
+goal = "Append text to the currently open note"
+inputs = ["text"]
+status = "verified"
+steps = [
+  { tap = "empty area below the last line of the note body", expect = "cursor at the end of the note" },
+  { key = "enter", expect = "new line" },
+  { send_text = "{text}", expect = "the text appears at the end of the note" },
+]
+stop_if = ["Notes list instead of an open note: tap the note first", "Locked note prompt"]
+
+[workflows.new_note]
+goal = "Create a note with text"
+inputs = ["text"]
+status = "untested"
+steps = [
+  { tap = "compose (square with pencil) button at the bottom right", expect = "empty note with cursor" },
+  { send_text = "{text}", expect = "text in the note; first line becomes the title" },
+]
+stop_if = ["Notes list without a compose button"]

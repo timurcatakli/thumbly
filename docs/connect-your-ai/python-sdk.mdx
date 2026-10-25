@@ -1,0 +1,30 @@
+---
+title: Python SDK
+description: Drive the iPhone from your own Python scripts.
+---
+
+The Python SDK (`thumbly-sdk`, in `packages/sdk-python`) handles approval and tokens for you. To write a client in another language, see the [SDK protocol](/docs/reference/sdk-protocol).
+
+## Install
+
+```sh
+uv pip install "thumbly-sdk @ git+https://github.com/timurcatakli/thumbly#subdirectory=packages/sdk-python"
+```
+
+## Run a script
+
+```python
+from thumbly_sdk import Phone
+
+with Phone() as phone:          # Thumbly on this Mac: http://127.0.0.1:8771
+    phone.open_app("com.apple.mobilenotes").type("hello").home()
+    phone.screenshot().save("screen.jpg")
+```
+
+With no address the SDK talks to Thumbly on the same Mac. For [remote access](/docs/remote-access), pass your public URL, for example `Phone("https://my-mac.tailnet.ts.net")`.
+
+## Approve it
+
+The first run prints an approval request with a code and a `thumbly://access?r=…` link. Open the link (or the Thumbly app), go to **Access**, check that the code matches and approve. Choose **Until I remove it** for unattended scripts. The grant is cached and refreshed without asking again.
+
+See the [SDK README](https://github.com/timurcatakli/thumbly/tree/main/packages/sdk-python) for the full API and the `thumbly-sdk` command line.

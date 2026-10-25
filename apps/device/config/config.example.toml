@@ -1,0 +1,30 @@
+# Optional settings. Copy to ~/Library/Application Support/Thumbly/config.toml and keep only the
+# lines you change; every setting has a default. Restart with `thumbly agent install`.
+
+# The dashboard and the MCP endpoint for agents on this Mac.
+# dashboard_port = 8770
+# local_mcp_port = 8771
+
+# Bind the iPhone on the cable automatically while none is bound (iOS still asks for Trust).
+# auto_pair = true
+
+# Remote MCP for cloud AI clients through Tailscale Funnel: the public HTTPS origin Funnel serves,
+# forwarded to http://127.0.0.1:<mcp_port>. Unset = off.
+# public_url = "https://my-mac.tailnet.ts.net"
+# mcp_port = 8090
+
+# Control lease: input is released after this many idle seconds.
+# lease_seconds = 90
+
+# Screenshots decode the phone's mirroring video on this Mac (~0.1 s); a lossless PNG is used
+# when the video has no fresh frame. JPEG quality for the decoded frames:
+# stream_jpeg_quality = 60
+
+# iPhone connection tuning.
+# auto_mount_ddi = true       # Mount the developer disk image after each phone restart (needs internet).
+# ddi_mount_deadline = 240    # Seconds allowed for download, personalization and mount.
+# discovery_seconds = 3       # Bonjour browse window for Wi-Fi discovery.
+# probe_interval = 30         # Wi-Fi only: check the session after this long without a request.
+# reconnect_min_seconds = 1
+# reconnect_max_seconds = 15
+# hid_idle_seconds = 20       # Close the touch/keyboard session after this much inactivity.

@@ -1,0 +1,39 @@
+---
+title: Uninstall
+description: Stop Thumbly and remove it from your Mac.
+---
+
+## With the installer
+
+```sh
+curl -fsSL https://raw.githubusercontent.com/timurcatakli/thumbly/main/install.sh | sh -s -- --uninstall
+```
+
+From a checkout, run `sh install.sh --uninstall`. This stops the background service, removes it from login, uninstalls the service and deletes `~/Applications/Thumbly.app`. Your settings and pairing stay in `~/Library/Application Support/Thumbly`.
+
+## By hand
+
+1. Stop the background service and remove it from login:
+
+   ```sh
+   thumbly agent uninstall
+   ```
+
+2. Remove the service and the app:
+
+   ```sh
+   uv tool uninstall thumbly
+   rm -rf ~/Applications/Thumbly.app
+   ```
+
+## Forget everything
+
+Optional: delete pairing records, approvals, activity and the logs:
+
+```sh
+rm -rf ~/Library/Application\ Support/Thumbly ~/Library/Logs/Thumbly
+```
+
+This cannot be undone. AI clients you approved lose access and must be approved again if you reinstall.
+
+To turn off Developer Mode on the iPhone, open **Settings → Privacy & Security → Developer Mode** and switch it off.

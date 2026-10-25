@@ -1,0 +1,21 @@
+# Weekly dependency updates, grouped per ecosystem so each week opens at most one PR each.
+# Security updates are separate and open as soon as an advisory is published.
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+    groups:
+      github-actions:
+        patterns: ['*']
+
+  - package-ecosystem: uv
+    directories:
+      - /apps/device
+      - /packages/sdk-python
+    schedule:
+      interval: weekly
+    groups:
+      python:
+        patterns: ['*']

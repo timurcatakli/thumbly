@@ -1,0 +1,27 @@
+# Local hooks run the project's own tool versions from uv.lock, so the hook, the shell,
+# and CI agree. Install once per clone from the repository root:
+# uv run --project apps/device pre-commit install
+repos:
+  - repo: local
+    hooks:
+      - id: ruff-check
+        name: ruff check
+        entry: uv run --project apps/device ruff check --fix
+        language: system
+        types_or: [python, pyi]
+        files: ^apps/device/(src|tests)/
+        require_serial: true
+      - id: ruff-format
+        name: ruff format
+        entry: uv run --project apps/device ruff format
+        language: system
+        types_or: [python, pyi]
+        files: ^apps/device/(src|tests)/
+        require_serial: true
+      - id: ty
+        name: ty check
+        entry: uv run --project apps/device ty check apps/device/src apps/device/tests
+        language: system
+        types_or: [python, pyi]
+        files: ^apps/device/(src|tests)/
+        pass_filenames: false

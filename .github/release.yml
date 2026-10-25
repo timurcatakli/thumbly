@@ -1,0 +1,14 @@
+# Sections for the notes that `gh release create --generate-notes` writes.
+changelog:
+  exclude:
+    authors:
+      - dependabot
+  categories:
+    - title: Security
+      labels: [security]
+    - title: Features
+      labels: [enhancement]
+    - title: Fixes
+      labels: [bug]
+    - title: Other changes
+      labels: ['*']

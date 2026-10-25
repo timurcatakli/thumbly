@@ -1,0 +1,28 @@
+---
+title: Turn on Developer Mode
+description: Allow Thumbly to control the iPhone and let it finish preparing the phone.
+---
+
+Developer Mode is an iPhone setting that lets a trusted Mac take screenshots and send touches and key presses.
+
+1. On the iPhone, open **Settings → Privacy & Security → Developer Mode**.
+2. Turn it on and tap **Restart**.
+3. After the restart, unlock the phone and tap **Turn On** to confirm. Enter your passcode if asked.
+
+## Developer Mode is not in Settings
+
+The option stays hidden until a Mac asks for it. In the Thumbly app, press **Show the switch** on the Developer Mode step and the setting appears on the iPhone. You can also reveal it from Terminal while the iPhone is plugged in:
+
+```sh
+thumbly developer-mode
+```
+
+Then check **Settings → Privacy & Security** again.
+
+## Thumbly finishes the rest
+
+After the restart, Thumbly installs Apple's developer disk image on the iPhone automatically. This needs internet access on the Mac and takes about 1–4 minutes the first time. Keep the iPhone plugged in and unlocked until the Thumbly app shows it is ready.
+
+<Callout type="success" title="Your iPhone is ready">When the Thumbly app shows your iPhone as connected, you can connect an AI.</Callout>
+
+Next: [Connect Claude Code](/docs/connect-your-ai/claude-code), or [use Wi-Fi](/docs/connect-your-iphone/use-wi-fi-after-pairing) instead of the cable.

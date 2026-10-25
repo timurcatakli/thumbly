@@ -1,0 +1,60 @@
+bundle_id = "com.burbn.instagram"
+name = "Instagram"
+schemes = ["instagram"]
+cold_launch_for_url = true
+text_input = "send_text"
+summary = "Profiles open by deep link. Messaging and search are done by landmarks; the app restarts on every deep link, so open the link first, then act."
+
+
+quirks = [
+  "A running Instagram ignores payloadURL; open_url restarts it, so unsaved drafts are lost.",
+  "In a chat the phone and video call buttons sit at the top right; never tap that corner blind.",
+  "No deep link opens a chat with a user: instagram://direct/inbox and https://ig.me/m/{username} both land on the Home feed. Use the send_dm workflow.",
+  "Not following a user: the profile shows a full-width Follow button and no Message button; 'Send message' still exists under the '...' menu.",
+  "Search field is search-as-you-type: use type_text there, not send_text.",
+  "First launch after install shows onboarding screens; handle by sight.",
+]
+
+[verified]
+date = "2026-09-29"
+app = "unknown"
+ios = "27.0"
+device = "iPhone14,5"
+
+[deep_links.profile]
+url = "instagram://user?username={username}"
+expect = "Profile header shows {username} with posts, followers, following counts. A 'Loading' bar that never fills means the username does not exist."
+status = "verified"
+
+[deep_links.inbox]
+url = "instagram://direct/inbox"
+expect = "Lands on the Home feed instead of Messages on the 2026-09 build; do not use"
+status = "broken"
+
+[workflows.view_profile]
+goal = "Read a user's public profile: name, bio, counts, whether it is private"
+inputs = ["username"]
+status = "verified"
+steps = [
+  { open = "profile", expect = "profile header shows {username}" },
+  { check = "Read name, bio, counts, and whether 'This profile is private' is shown" },
+]
+stop_if = ["Loading bar with empty counts after 5 s: unknown username", "Login screen"]
+
+[workflows.send_dm]
+goal = "Send a text message to a user"
+inputs = ["username", "text"]
+status = "verified"
+steps = [
+  { open = "profile", expect = "profile header shows {username}" },
+  { tap = "Message button under the bio (next to Following). If only a full-width Follow button shows, tap the '...' at the top right and choose 'Send message' from the sheet instead", expect = "chat header shows the user's name and 'Active now' or last seen; 'Message...' field at the bottom" },
+  { tap = "'Message...' field at the bottom left, left of the microphone icon", expect = "cursor in the field; a 'Say hi with a sticker!' strip may sit above it" },
+  { send_text = "{text}", expect = "{text} in the field; purple Send arrow appears at the bottom right" },
+  { tap = "purple Send arrow at the bottom right of the field", expect = "purple bubble on the right with {text} and a timestamp" },
+]
+stop_if = [
+  "Login screen or verification prompt",
+  "Dialog mentioning limits, suspicious activity or a blocked action",
+  "Voice or video call screen: tap the red end-call button, then report",
+]
+

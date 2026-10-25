@@ -1,0 +1,36 @@
+---
+title: Mac app tour
+description: What each screen of the Thumbly app on your Mac does.
+---
+
+The Thumbly app is where you, the owner, run everything: setup, approvals, Pause and settings. It talks only to the Thumbly service on the same Mac, so whoever uses the Mac is the owner. Open it from `~/Applications/Thumbly.app`, the menu bar, or with `thumbly open`.
+
+| Screen | What it does |
+| --- | --- |
+| **Setup** | Shown until your iPhone is ready. Four steps: **Plug in your iPhone**, **Trust this Mac**, **Turn on Developer Mode** (with a **Show the switch** button that reveals the setting on the iPhone), then ready. |
+| **Status** | Shows whether the iPhone is connected (USB or Wi-Fi), how many AI clients are allowed and what you need to do next. The **Emergency brake** card holds **Pause AI control**. |
+| **Access** | Lists AI clients and scripts **Waiting for you**: **Allow for 24 hours**, **30 days**, **Until I remove it**, or **Deny**. Allowed clients are listed below; **Remove** takes away access right away. |
+| **Activity** | Everything AI clients did on your iPhone, newest first. Activity is kept for 30 days. Screenshots and typed or sent text are never stored. |
+| **Settings** | Version and MCP URL, **Copy command** to connect Claude Code, **Use another iPhone**, **Export diagnostics** and **Reset Thumbly**. |
+
+## Pause
+
+**Pause AI control** stops every AI input at once and cancels pending input. An AI client can resume only when you ask it to. Pause is on the **Status** screen and in the menu bar.
+
+## Menu bar
+
+The hand icon in the menu bar shows Thumbly's status (it changes while paused), the number of pending access requests, a one-click **Pause AI control**, and **Open Thumbly**. New access requests also appear as macOS notifications.
+
+## Approval links
+
+When an AI client or script asks for access, its sign-in page in the browser says **Approve in the Thumbly app** with an **Open Thumbly** button. The button opens a `thumbly://access?r=…` link, which brings up **Access** with that request highlighted.
+
+## Settings actions
+
+- **Use another iPhone** forgets the current iPhone so you can plug in and trust a different one. AI clients keep their access.
+- **Export diagnostics** saves a report to attach to a bug report. Identifiers are redacted. See [Collect diagnostics](/docs/troubleshoot/collect-diagnostics).
+- **Reset Thumbly** erases the pairing (including this iPhone's Wi-Fi pairing record), every AI client and all activity, then restarts Thumbly. Type **Thumbly** to confirm. See [Update, reset and uninstall](/docs/reference/update-reset-and-uninstall).
+
+## Thumbly isn't running
+
+If the background service is stopped, the app shows **Thumbly isn't running** with a **Start Thumbly** button. If that does not help, see [Troubleshooting by symptom](/docs/troubleshoot/troubleshooting-by-symptom).

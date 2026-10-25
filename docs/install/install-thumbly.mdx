@@ -1,0 +1,50 @@
+---
+title: Install Thumbly
+description: Install Thumbly on your Mac with one command.
+---
+
+## One-line install
+
+Open **Terminal** and run:
+
+```sh
+curl -fsSL https://raw.githubusercontent.com/timurcatakli/thumbly/main/install.sh | sh
+```
+
+The script:
+
+1. Checks that the Mac runs macOS 14 or later.
+2. Installs [uv](https://docs.astral.sh/uv/) if it is missing.
+3. Downloads Thumbly and installs the background service with `uv tool install`.
+4. Builds the Thumbly app and installs it as `~/Applications/Thumbly.app`.
+5. Runs `thumbly agent install`, which starts Thumbly in the background now and at every login.
+6. Opens the Thumbly app.
+
+No `sudo` is needed and no config file is required.
+
+<Callout type="warn" title="Command Line Tools">Building the app needs Apple's Command Line Tools. If they are missing, the installer skips the app and says so. Run `xcode-select --install`, then run the install command again.</Callout>
+
+## Install from a checkout
+
+If you already have the source code, run the installer from it:
+
+```sh
+sh install.sh --source /path/to/thumbly
+```
+
+To open the app later, use `~/Applications/Thumbly.app` or run `thumbly open`.
+
+## Where things live
+
+| What | Where |
+| --- | --- |
+| Background service | launchd agent `com.thumbly.agent` (`thumbly agent status`) |
+| Logs | `~/Library/Logs/Thumbly/thumbly.log` |
+| State (pairing, approvals, activity) | `~/Library/Application Support/Thumbly` |
+| Optional settings | `~/Library/Application Support/Thumbly/config.toml` |
+| Thumbly app | `~/Applications/Thumbly.app` (`thumbly open`) |
+| MCP endpoint for local AI apps | `http://127.0.0.1:8771/mcp` |
+
+<Callout type="success" title="Thumbly is running">When the Thumbly app opens and asks you to plug in your iPhone, installation is done.</Callout>
+
+Next: [Plug in your iPhone and tap Trust](/docs/connect-your-iphone/plug-in-and-trust).

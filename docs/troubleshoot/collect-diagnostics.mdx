@@ -1,0 +1,16 @@
+---
+title: Collect diagnostics
+description: What to send when asking for help.
+---
+
+1. In the Thumbly app, open **Settings → Export diagnostics** and save the report. Identifiers are redacted.
+2. Note the service state:
+
+   ```sh
+   thumbly agent status
+   ```
+
+3. Copy the lines around the problem from `~/Library/Logs/Thumbly/thumbly.log`.
+4. Open a [bug report](https://github.com/timurcatakli/thumbly/issues/new?template=bug_report.yml) and attach what you collected, with your macOS, iPhone and iOS versions.
+
+Remove private data before you share anything. Do not post credentials, your iPhone's UDID or serial number, or screenshots of private content. Report security problems privately as described in the [security policy](https://github.com/timurcatakli/thumbly/security/policy).

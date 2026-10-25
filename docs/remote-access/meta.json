@@ -1,0 +1,4 @@
+{
+	"title": "Remote access",
+	"pages": ["index", "set-up-tailscale"]
+}

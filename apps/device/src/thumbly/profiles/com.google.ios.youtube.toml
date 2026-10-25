@@ -1,0 +1,51 @@
+bundle_id = "com.google.ios.youtube"
+name = "YouTube"
+schemes = ["youtube", "vnd.youtube"]
+cold_launch_for_url = true
+text_input = "type_text"
+summary = "Search results and videos open by deep link, so a play task is one link, one screenshot to pick the video, one tap. The search field is search-as-you-type."
+
+
+quirks = [
+  "The search field is search-as-you-type: use type_text there, then tap a suggestion or the keyboard's Search key.",
+  "The first result is often an ad or a Short; read the channel name and duration before tapping. The official video usually shows the artist channel with a check mark.",
+  "A playing video keeps changing: never wait for a static screen. The player shows a pause control and a red progress bar when playback has started.",
+  "First launch after install shows sign-in and notification prompts; handle by sight and report if they block the task.",
+  "A picture-in-picture or mini player at the bottom means a previous video is still open; tap it to return or swipe it down to close.",
+]
+
+[verified]
+date = "2026-09-30"
+app = "unknown"
+ios = "27.0"
+device = "iPhone14,5"
+
+[deep_links.search]
+url = "youtube://www.youtube.com/results?search_query={query}"
+expect = "Search results for the query with thumbnails, titles, channel names and durations; the query sits in the search field at the top"
+status = "untested"
+
+[deep_links.video]
+url = "youtube://www.youtube.com/watch?v={video_id}"
+expect = "The player at the top with the video title below it; playback starts on its own"
+status = "untested"
+
+[deep_links.channel]
+url = "youtube://www.youtube.com/@{handle}"
+expect = "Channel page with banner, subscriber count and Videos tab"
+status = "untested"
+
+[workflows.play_search_result]
+goal = "Play a video found by search, e.g. a song by name"
+inputs = ["query"]
+status = "untested"
+steps = [
+  { open = "search", expect = "results list for {query}" },
+  { check = "Choose the result that matches the goal: title, channel with check mark, duration; skip ads and Shorts" },
+  { tap = "the thumbnail of the chosen result", expect = "player at the top with the video title; pause control and red progress bar visible" },
+]
+stop_if = [
+  "Sign-in or age verification prompt",
+  "'Video unavailable' or a blank player after 5 s",
+  "Notification or premium offer sheet covering the results: dismiss with its X only if visible, else report",
+]

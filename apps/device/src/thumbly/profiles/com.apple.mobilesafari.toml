@@ -1,0 +1,33 @@
+bundle_id = "com.apple.mobilesafari"
+name = "Safari"
+schemes = ["http", "https"]
+cold_launch_for_url = false
+text_input = "send_text"
+summary = "open_url with an http(s) URL loads it here without restarting Safari. Cmd+L focuses the address bar for typed navigation."
+
+quirks = [
+  "Typing a custom-scheme URL here raises an 'Open this page in ...' sheet; prefer open_url with bundle_id instead.",
+  "Cmd+L focuses the address bar with no visible change on screen.",
+]
+
+[verified]
+date = "2026-09-29"
+app = "iOS 27.0"
+ios = "27.0"
+device = "iPhone14,5"
+
+[deep_links.page]
+url = "{url}"
+expect = "Page rendered; address bar at the bottom shows the domain"
+status = "verified"
+
+[workflows.open_page]
+goal = "Load a web page and read it"
+inputs = ["url"]
+status = "verified"
+steps = [
+  { open = "page", expect = "address bar shows the domain" },
+  { wait = 2, expect = "page content rendered" },
+  { check = "Read the page; swipe up to scroll" },
+]
+stop_if = ["'Safari can't open the page'", "Certificate warning"]

@@ -1,0 +1,30 @@
+---
+title: Set up Tailscale
+description: Give Thumbly a public HTTPS address with Tailscale Funnel.
+---
+
+1. Install [Tailscale](https://tailscale.com/download/mac) on your Mac and sign in.
+2. In the Tailscale admin console, turn on **HTTPS certificates** and allow **Funnel** for this Mac. Note its name, for example `my-mac.tailnet.ts.net`.
+3. Add the address to `~/Library/Application Support/Thumbly/config.toml` (create the file if it does not exist; `apps/device/config/config.example.toml` in the repository lists every setting):
+
+   ```toml
+   public_url = "https://my-mac.tailnet.ts.net"
+   ```
+
+4. Restart Thumbly. The remote MCP entry listens on port 8090:
+
+   ```sh
+   thumbly agent install
+   ```
+
+5. Publish that port through Funnel:
+
+   ```sh
+   tailscale funnel --bg 8090
+   ```
+
+Your remote MCP URL is `https://my-mac.tailnet.ts.net/mcp`. Add it as a custom connector (HTTP MCP server) in Claude.ai or ChatGPT, then approve the request in the Thumbly app on your Mac under **Access**.
+
+To turn remote access off, run `tailscale funnel --bg 8090 off`, remove `public_url` from `config.toml` and run `thumbly agent install` again.
+
+<Callout type="warn">Your Mac must be awake and online for remote clients to reach the iPhone.</Callout>

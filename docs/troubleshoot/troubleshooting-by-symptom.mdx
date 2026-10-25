@@ -1,0 +1,19 @@
+---
+title: Troubleshooting by symptom
+description: Common problems and fixes.
+---
+
+| Symptom | Fix |
+| --- | --- |
+| The app says **Thumbly isn't running** | Press **Start Thumbly**. If it stays stopped, run `thumbly agent status`, then `thumbly agent install`, and check `~/Library/Logs/Thumbly/thumbly.log`. |
+| Thumbly app is missing | Install Apple's Command Line Tools with `xcode-select --install`, then run the install command again. |
+| iPhone not found | Use a USB data cable, unlock the iPhone and plug it straight into the Mac rather than a hub. |
+| `TRUST_REQUIRED` | Plug the iPhone in by USB, unlock it and tap **Trust**. |
+| Developer Mode is missing in Settings | Press **Show the switch** in the Thumbly app, or see [Turn on Developer Mode](/docs/connect-your-iphone/turn-on-developer-mode). |
+| Developer disk image does not mount | The Mac needs internet access after each iPhone restart. The first install takes 1–4 minutes. |
+| `WIFI_PAIRING_REQUIRED` | Pair once over USB to create the Wi-Fi pairing record. |
+| AI says it is not authorized | Approve the client in the Thumbly app under **Access**, or authenticate again (`/mcp` in Claude Code). |
+| Actions stop working | Check that AI control is not paused (Status screen or menu bar). Control lapses after 90 seconds without activity; the next action takes it again. |
+| Remote access fails | Check `public_url` in `config.toml` and `tailscale funnel status`. Local AI apps keep working. |
+
+Still stuck? [Collect diagnostics](/docs/troubleshoot/collect-diagnostics).

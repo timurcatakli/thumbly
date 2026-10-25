@@ -1,0 +1,33 @@
+---
+title: Claude Code
+description: Connect Claude Code to Thumbly, approve it and try your first conversation.
+---
+
+Start here when the Thumbly app shows your iPhone as connected. Claude Code talks to Thumbly over MCP, the connection method AI apps use for tools. Thumbly's MCP address on your Mac is `http://127.0.0.1:8771/mcp`.
+
+## 1. Add Thumbly
+
+```sh
+claude mcp add --transport http thumbly http://127.0.0.1:8771/mcp
+```
+
+## 2. Sign in
+
+1. Start `claude` and type `/mcp`.
+2. Choose **thumbly** and then **Authenticate**. A browser page opens that says **Approve in the Thumbly app**.
+
+## 3. Approve in the Thumbly app
+
+Click **Open Thumbly** on that page. The Thumbly app opens on **Access** with the request highlighted. Choose **Allow for 24 hours**, **30 days** or **Until I remove it**. The browser page continues on its own.
+
+The **Copy command** button in the app's **Settings** copies the command from step 1. See [Approve and control access](/docs/connect-your-ai/approve-and-control-access).
+
+## 4. Try a first conversation
+
+Ask Claude:
+
+> Take a screenshot of my iPhone and describe what you see.
+
+If Claude can describe the screen, the connection works. You can stop phone control at any time with **Pause AI control** in the Thumbly app or the menu bar.
+
+If it does not work, check that the Thumbly app shows the iPhone as connected and that you approved the request. Then visit [Help](/docs/troubleshoot/troubleshooting-by-symptom).

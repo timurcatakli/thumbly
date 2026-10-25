@@ -1,0 +1,44 @@
+bundle_id = "net.whatsapp.WhatsApp"
+name = "WhatsApp"
+schemes = ["whatsapp"]
+cold_launch_for_url = true
+text_input = "send_text"
+summary = "The send deep link opens a chat by phone number with the text already in the field; one tap on Send finishes."
+
+
+quirks = [
+  "phone is international format without plus, e.g. 15555550123. Pass text as plain words: Thumbly percent-encodes it.",
+  "The call buttons sit at the top right of a chat; never tap there blind.",
+  "First-run screens (Chat backup) can appear before the deep link is applied.",
+]
+
+[verified]
+date = "2026-09-29"
+app = "unknown"
+ios = "27.0"
+device = "iPhone14,5"
+
+[deep_links.chat]
+url = "whatsapp://send?phone={phone}"
+expect = "Chat with the number; empty text field at the bottom"
+status = "untested"
+
+[deep_links.chat_with_text]
+url = "whatsapp://send?phone={phone}&text={text}"
+expect = "Chat with the number; the text sits in the field as a draft, green Send arrow at bottom right"
+status = "verified"
+
+[workflows.send_message]
+goal = "Send a text message to a phone number"
+inputs = ["phone", "text"]
+status = "verified"
+steps = [
+  { open = "chat_with_text", expect = "chat header shows the number; draft text in the field" },
+  { wait = 3, expect = "cold launch finished, chat visible" },
+  { tap = "green Send arrow at the bottom right", expect = "message bubble on the right with the text and a tick" },
+]
+stop_if = [
+  "Chat backup or other first-run screen: report, do not choose settings",
+  "Number not on WhatsApp dialog",
+  "Voice or video call screen: tap the red end-call button, then report",
+]

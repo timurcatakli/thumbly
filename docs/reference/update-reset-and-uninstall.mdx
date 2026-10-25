@@ -1,0 +1,33 @@
+---
+title: Update, reset and uninstall
+description: Keep Thumbly current, start over, or remove it from your Mac.
+---
+
+## Update
+
+Run the install command again:
+
+```sh
+curl -fsSL https://raw.githubusercontent.com/timurcatakli/thumbly/main/install.sh | sh
+```
+
+This updates the service and rebuilds the Thumbly app. Pairing, approvals and settings in `~/Library/Application Support/Thumbly` are kept.
+
+## Reset
+
+In the Thumbly app, open **Settings → Reset Thumbly…** and type **Thumbly** to confirm. Thumbly erases its pairing (including this iPhone's Wi-Fi pairing record), every AI client and all activity, restarts, and shows setup again. AI clients must ask again.
+
+To switch to a different iPhone without losing AI clients, use **Settings → Use another iPhone** instead.
+
+## Check the background service
+
+```sh
+thumbly agent status      # installed, running, process id and log path
+thumbly agent install     # restart it
+```
+
+Logs are in `~/Library/Logs/Thumbly/thumbly.log`.
+
+## Uninstall
+
+See [Uninstall](/docs/install/uninstall).

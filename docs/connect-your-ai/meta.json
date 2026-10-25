@@ -1,0 +1,11 @@
+{
+	"title": "3. Connect your AI",
+	"pages": [
+		"claude-code",
+		"claude-desktop",
+		"other-mcp-clients",
+		"approve-and-control-access",
+		"---For developers---",
+		"python-sdk"
+	]
+}

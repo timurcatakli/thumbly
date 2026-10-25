@@ -1,0 +1,18 @@
+---
+title: Other MCP clients
+description: Connect any MCP client that supports HTTP servers and OAuth.
+---
+
+Any MCP client on your Mac that supports **HTTP** (streamable HTTP) servers with OAuth can use Thumbly.
+
+| Setting | Value |
+| --- | --- |
+| Transport | HTTP |
+| URL | `http://127.0.0.1:8771/mcp` |
+| Authentication | OAuth 2.1 (the client registers itself and opens a sign-in page) |
+
+After the client starts sign-in, click **Open Thumbly** on the sign-in page and approve the request in the Thumbly app under **Access**. Every client needs its own approval.
+
+Hosted clients such as Claude.ai and ChatGPT cannot reach `127.0.0.1`. They need a public HTTPS address: see [Remote access](/docs/remote-access).
+
+Scripts that cannot open a browser use the [Python SDK](/docs/connect-your-ai/python-sdk) or the [SDK protocol](/docs/reference/sdk-protocol) instead.

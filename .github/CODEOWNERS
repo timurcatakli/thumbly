@@ -1,0 +1,2 @@
+# Default reviewer for every change. GitHub requests a review from the owners of matched paths.
+* @timurcatakli

@@ -1,0 +1,38 @@
+bundle_id = "com.apple.Preferences"
+name = "Settings"
+schemes = ["prefs", "App-prefs"]
+cold_launch_for_url = false
+text_input = "type_text"
+summary = "Read-only navigation by default: the agent reports what it sees and does not toggle settings unless the owner asked for that exact change."
+
+
+quirks = [
+  "Never toggle switches unless the owner asked for that exact change.",
+  "Search field at the top is search-as-you-type: use type_text.",
+]
+
+[verified]
+date = "2026-09-29"
+app = "iOS 27.0"
+ios = "27.0"
+device = "iPhone14,5"
+
+[deep_links.root]
+url = "App-prefs:"
+expect = "Main Settings list"
+status = "untested"
+
+[deep_links.section]
+url = "App-prefs:{section}"
+expect = "The named section, e.g. WIFI, BLUETOOTH, General"
+status = "untested"
+
+[workflows.read_section]
+goal = "Open a Settings section and report its values"
+inputs = ["section"]
+status = "untested"
+steps = [
+  { open = "section", expect = "section header matches {section}" },
+  { check = "Read the rows; swipe up for more" },
+]
+stop_if = ["Main list instead of the section: navigate by tapping the row by name"]

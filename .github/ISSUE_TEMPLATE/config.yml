@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Report a security vulnerability
+    url: https://github.com/timurcatakli/thumbly/security/advisories/new
+    about: Report security problems privately. Do not open a public issue.
+  - name: Ask a question
+    url: https://github.com/timurcatakli/thumbly/discussions
+    about: Ask setup and usage questions in Discussions.
+  - name: Contributing guide
+    url: https://github.com/timurcatakli/thumbly/blob/main/CONTRIBUTING.md
+    about: Read how to set up a development environment and open a pull request.

@@ -1,0 +1,12 @@
+---
+title: Why remote access
+description: How Claude.ai, ChatGPT and other hosted AI clients reach Thumbly on your Mac.
+---
+
+Remote access is optional. AI apps on your Mac, such as Claude Code and Claude Desktop, connect to `http://127.0.0.1:8771/mcp` and do not need it.
+
+Claude.ai, ChatGPT and other hosted AI clients run in the cloud and cannot reach your Mac's loopback address. They need a public HTTPS URL. [Tailscale Funnel](/docs/remote-access/set-up-tailscale) provides one.
+
+Thumbly keeps the MCP server, its OAuth server and every approval on your Mac; the tunnel only carries TLS. Every remote client still needs your approval in the Thumbly app under **Access**.
+
+Next: [Set up Tailscale](/docs/remote-access/set-up-tailscale).
