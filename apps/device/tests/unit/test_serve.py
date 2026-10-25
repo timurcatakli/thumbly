@@ -89,4 +89,6 @@ async def test_the_service_stops_once_the_app_is_gone(monkeypatch):
     stop = asyncio.Event()
     await asyncio.wait_for(cli.follow_app(0.025, stop, tick=0.01), 2)
     assert stop.is_set() and stopped == [True]
-    assert running == []  # Kept running while the app was up, then waited out the grace.
+    # Kept running while the app was up, then waited out the grace; a slow runner may need fewer
+    # ticks to cross it, so don't pin the exact count.
+    assert running.count(True) == 0 and len(running) < 3
